@@ -36,6 +36,28 @@ public sealed class Match
 
     public void Finish() => Status = MatchStatus.Finished;
 
+    public void Update(Guid homeTeamId, Guid awayTeamId, DateTime scheduledAtUtc)
+    {
+        if (homeTeamId == Guid.Empty || awayTeamId == Guid.Empty)
+        {
+            throw new ArgumentException("Ambos equipos son obligatorios.");
+        }
+
+        if (homeTeamId == awayTeamId)
+        {
+            throw new ArgumentException("Un equipo no puede jugar contra sí mismo.");
+        }
+
+        if (Status != MatchStatus.Scheduled)
+        {
+            throw new InvalidOperationException("Solo se puede modificar un partido programado.");
+        }
+
+        HomeTeamId = homeTeamId;
+        AwayTeamId = awayTeamId;
+        ScheduledAtUtc = scheduledAtUtc.ToUniversalTime();
+    }
+
     public Goal AddGoal(Guid playerId, Guid teamId, int minute)
     {
         if (Status == MatchStatus.Finished)
@@ -47,9 +69,9 @@ public sealed class Match
         {
             throw new ArgumentException("El equipo no participa en este partido.", nameof(teamId));
         }
-        if (minute < 0 || minute > 120)
+        if (minute is < 1 or > 120)
         {
-            throw new ArgumentOutOfRangeException(nameof(minute), "El minuto del gol debe estar entre 0 y 120.");
+            throw new ArgumentOutOfRangeException(nameof(minute), "El minuto del gol debe estar entre 1 y 120.");
         }
 
         var goal = new Goal(playerId, teamId, minute);

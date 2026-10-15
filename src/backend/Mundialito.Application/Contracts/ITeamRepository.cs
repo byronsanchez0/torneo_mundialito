@@ -4,8 +4,12 @@ namespace Mundialito.Application.Contracts;
 
 public interface ITeamRepository
 {
-    Task<IReadOnlyCollection<Team>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Team?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    Task AddAsync(Team team, CancellationToken cancellationToken = default);
+    Task<bool> NameExistsAsync(
+        string name,
+        Guid? excludedTeamId = null,
+        CancellationToken cancellationToken = default);
+    void Add(Team team);
+    void Remove(Team team);
 }
 

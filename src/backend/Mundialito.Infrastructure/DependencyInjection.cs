@@ -20,8 +20,18 @@ public static class DependencyInjection
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<IPlayerRepository, PlayerRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
+    }
+
+    public static async Task InitializeDatabaseAsync(
+        this IServiceProvider services,
+        CancellationToken cancellationToken = default)
+    {
+        await using var scope = services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<MundialitoDbContext>();
+        await dbContext.Database.EnsureCreatedAsync(cancellationToken);
     }
 }
 

@@ -31,6 +31,30 @@ public sealed class Player
     public int ShirtNumber { get; private set; }
     public string Position { get; private set; } = string.Empty;
 
+    public void Update(
+        Guid teamId,
+        string firstName,
+        string lastName,
+        int shirtNumber,
+        string position)
+    {
+        if (teamId == Guid.Empty)
+        {
+            throw new ArgumentException("El equipo es obligatorio.", nameof(teamId));
+        }
+
+        if (shirtNumber is < 1 or > 99)
+        {
+            throw new ArgumentOutOfRangeException(nameof(shirtNumber), "El dorsal debe estar entre 1 y 99.");
+        }
+
+        TeamId = teamId;
+        FirstName = Required(firstName, nameof(firstName));
+        LastName = Required(lastName, nameof(lastName));
+        ShirtNumber = shirtNumber;
+        Position = Required(position, nameof(position));
+    }
+
     private static string Required(string value, string parameterName)
     {
         if (string.IsNullOrWhiteSpace(value))

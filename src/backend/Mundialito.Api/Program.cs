@@ -1,11 +1,22 @@
-using Microsoft.EntityFrameworkCore;
-using Mundialito.Application.Contracts;
+using Mundialito.Api.Endpoints;
+using Mundialito.Application.Features.Matches.Commands;
+using Mundialito.Application.Features.Players.Commands;
+using Mundialito.Application.Features.Teams.Commands;
 using Mundialito.Infrastructure;
-using Mundialito.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddScoped<CreateTeamCommandHandler>();
+builder.Services.AddScoped<UpdateTeamCommandHandler>();
+builder.Services.AddScoped<DeleteTeamCommandHandler>();
+builder.Services.AddScoped<CreatePlayerCommandHandler>();
+builder.Services.AddScoped<UpdatePlayerCommandHandler>();
+builder.Services.AddScoped<DeletePlayerCommandHandler>();
+builder.Services.AddScoped<CreateMatchCommandHandler>();
+builder.Services.AddScoped<UpdateMatchCommandHandler>();
+builder.Services.AddScoped<DeleteMatchCommandHandler>();
+builder.Services.AddScoped<RegisterGoalCommandHandler>();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy => policy
@@ -18,23 +29,15 @@ var app = builder.Build();
 
 if (builder.Configuration.GetValue<bool>("InitializeDatabase"))
 {
-    await using var scope = app.Services.CreateAsyncScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<MundialitoDbContext>();
-    await dbContext.Database.EnsureCreatedAsync();
+    await app.Services.InitializeDatabaseAsync();
 }
 
 app.UseCors();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
-
-app.MapGet("/api/teams", (ITeamRepository repository, CancellationToken cancellationToken) =>
-    repository.GetAllAsync(cancellationToken));
-
-app.MapGet("/api/players", (IPlayerRepository repository, CancellationToken cancellationToken) =>
-    repository.GetAllAsync(cancellationToken));
-
-app.MapGet("/api/matches", (IMatchRepository repository, CancellationToken cancellationToken) =>
-    repository.GetAllAsync(cancellationToken));
+app.MapTeamEndpoints();
+app.MapPlayerEndpoints();
+app.MapMatchEndpoints();
 
 app.Run();
 

@@ -7,21 +7,21 @@ namespace Mundialito.Infrastructure.Repositories;
 
 internal sealed class MatchRepository(MundialitoDbContext dbContext) : IMatchRepository
 {
-    public async Task<IReadOnlyCollection<Match>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        await dbContext.Matches.AsNoTracking()
-            .Include(match => match.Goals)
-            .OrderBy(match => match.ScheduledAtUtc)
-            .ToListAsync(cancellationToken);
-
     public Task<Match?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
-        dbContext.Matches.AsNoTracking()
+        dbContext.Matches
             .Include(match => match.Goals)
             .FirstOrDefaultAsync(match => match.Id == id, cancellationToken);
 
-    public async Task AddAsync(Match match, CancellationToken cancellationToken = default)
-    {
-        dbContext.Matches.Add(match);
-        await dbContext.SaveChangesAsync(cancellationToken);
-    }
+    public Task<bool> AnyByTeamIdAsync(Guid teamId, CancellationToken cancellationToken = default) =>
+        dbContext.Matches.AnyAsync(
+            match => match.HomeTeamId == teamId || match.AwayTeamId == teamId,
+            cancellationToken);
+
+    public Task<bool> AnyGoalByPlayerIdAsync(Guid playerId, CancellationToken cancellationToken = default) =>
+        dbContext.Set<Goal>().AnyAsync(goal => goal.PlayerId == playerId, cancellationToken);
+
+    public void Add(Match match) => dbContext.Matches.Add(match);
+
+    public void Remove(Match match) => dbContext.Matches.Remove(match);
 }
 

@@ -31,6 +31,25 @@ Web ──HTTP──> Api
 `Goal` pertenece al agregado `Match`. Por eso solo existen contratos de
 repositorio para `Team`, `Player` y `Match`.
 
+## Write side
+
+Las operaciones de escritura pasan por un Command Handler y confirman los
+cambios mediante un único `IUnitOfWork`. Los repositorios no guardan cambios
+directamente. El read side se implementará por separado.
+
+| Método | Ruta |
+| --- | --- |
+| `POST` | `/api/teams` |
+| `PUT` | `/api/teams/{id}` |
+| `DELETE` | `/api/teams/{id}` |
+| `POST` | `/api/players` |
+| `PUT` | `/api/players/{id}` |
+| `DELETE` | `/api/players/{id}` |
+| `POST` | `/api/matches` |
+| `PUT` | `/api/matches/{id}` |
+| `DELETE` | `/api/matches/{id}` |
+| `POST` | `/api/matches/{matchId}/goals` |
+
 ## Base de datos
 
 La API espera PostgreSQL en `localhost:5455`. La cadena predeterminada es solo

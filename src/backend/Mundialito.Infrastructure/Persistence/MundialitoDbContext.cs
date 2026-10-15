@@ -3,7 +3,7 @@ using Mundialito.Domain.Entities;
 
 namespace Mundialito.Infrastructure.Persistence;
 
-public sealed class MundialitoDbContext(DbContextOptions<MundialitoDbContext> options)
+internal sealed class MundialitoDbContext(DbContextOptions<MundialitoDbContext> options)
     : DbContext(options)
 {
     public DbSet<Team> Teams => Set<Team>();

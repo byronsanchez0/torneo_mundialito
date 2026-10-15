@@ -7,19 +7,25 @@ namespace Mundialito.Infrastructure.Repositories;
 
 internal sealed class PlayerRepository(MundialitoDbContext dbContext) : IPlayerRepository
 {
-    public async Task<IReadOnlyCollection<Player>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        await dbContext.Players.AsNoTracking()
-            .OrderBy(player => player.LastName)
-            .ThenBy(player => player.FirstName)
-            .ToListAsync(cancellationToken);
-
     public Task<Player?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
-        dbContext.Players.AsNoTracking().FirstOrDefaultAsync(player => player.Id == id, cancellationToken);
+        dbContext.Players.FirstOrDefaultAsync(player => player.Id == id, cancellationToken);
 
-    public async Task AddAsync(Player player, CancellationToken cancellationToken = default)
-    {
-        dbContext.Players.Add(player);
-        await dbContext.SaveChangesAsync(cancellationToken);
-    }
+    public Task<bool> ShirtNumberExistsAsync(
+        Guid teamId,
+        int shirtNumber,
+        Guid? excludedPlayerId = null,
+        CancellationToken cancellationToken = default) =>
+        dbContext.Players.AnyAsync(
+            player => player.TeamId == teamId
+                && player.ShirtNumber == shirtNumber
+                && (!excludedPlayerId.HasValue || player.Id != excludedPlayerId.Value),
+            cancellationToken);
+
+    public Task<bool> AnyByTeamIdAsync(Guid teamId, CancellationToken cancellationToken = default) =>
+        dbContext.Players.AnyAsync(player => player.TeamId == teamId, cancellationToken);
+
+    public void Add(Player player) => dbContext.Players.Add(player);
+
+    public void Remove(Player player) => dbContext.Players.Remove(player);
 }
 
