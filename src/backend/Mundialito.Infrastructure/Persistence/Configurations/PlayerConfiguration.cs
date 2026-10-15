@@ -20,6 +20,7 @@ internal sealed class PlayerConfiguration : IEntityTypeConfiguration<Player>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasIndex(player => new { player.TeamId, player.ShirtNumber }).IsUnique();
+        builder.HasIndex(player => new { player.LastName, player.FirstName, player.Id });
     }
 }
 

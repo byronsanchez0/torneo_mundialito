@@ -1,4 +1,5 @@
 using Mundialito.Application.Features.Matches.Commands;
+using Mundialito.Application.Features.Matches.Queries;
 
 namespace Mundialito.Api.Endpoints;
 
@@ -7,6 +8,28 @@ internal static class MatchEndpoints
     public static IEndpointRouteBuilder MapMatchEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/matches").WithTags("Matches");
+
+        group.MapGet("", async (
+            GetMatchesQueryHandler handler,
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20) =>
+        {
+            var result = await handler.HandleAsync(
+                new GetMatchesQuery(page, pageSize),
+                cancellationToken);
+
+            return Results.Ok(result);
+        });
+
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            GetMatchByIdQueryHandler handler,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await handler.HandleAsync(new GetMatchByIdQuery(id), cancellationToken);
+            return result.IsSuccess ? Results.Ok(result.Value) : result.ToHttpFailure();
+        });
 
         group.MapPost("", async (
             CreateMatchRequest request,

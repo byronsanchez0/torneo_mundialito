@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="../Mundialito.Application/Mundialito.Application.csproj" />
     <ProjectReference Include="../Mundialito.Domain/Mundialito.Domain.csproj" />
+    <PackageReference Include="Dapper" Version="2.1.89" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>

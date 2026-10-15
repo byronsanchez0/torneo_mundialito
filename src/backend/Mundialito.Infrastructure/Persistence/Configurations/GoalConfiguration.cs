@@ -20,6 +20,8 @@ internal sealed class GoalConfiguration : IEntityTypeConfiguration<Goal>
             .WithMany()
             .HasForeignKey(goal => goal.TeamId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasIndex("MatchId", nameof(Goal.TeamId), nameof(Goal.Minute));
     }
 }
 

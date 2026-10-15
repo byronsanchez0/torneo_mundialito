@@ -30,6 +30,8 @@ internal sealed class MatchConfiguration : IEntityTypeConfiguration<Match>
         var goalsNavigation = builder.Metadata.FindNavigation(nameof(Match.Goals));
         goalsNavigation?.SetField("_goals");
         goalsNavigation?.SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasIndex(match => new { match.ScheduledAtUtc, match.Id });
     }
 }
 

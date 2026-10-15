@@ -31,20 +31,27 @@ Web ──HTTP──> Api
 `Goal` pertenece al agregado `Match`. Por eso solo existen contratos de
 repositorio para `Team`, `Player` y `Match`.
 
-## Write side
+## API
 
 Las operaciones de escritura pasan por un Command Handler y confirman los
 cambios mediante un único `IUnitOfWork`. Los repositorios no guardan cambios
-directamente. El read side se implementará por separado.
+directamente. Las lecturas usan exclusivamente Dapper, devuelven DTOs y se
+paginan desde PostgreSQL.
 
 | Método | Ruta |
 | --- | --- |
+| `GET` | `/api/teams?page=1&pageSize=20` |
+| `GET` | `/api/teams/{id}` |
 | `POST` | `/api/teams` |
 | `PUT` | `/api/teams/{id}` |
 | `DELETE` | `/api/teams/{id}` |
+| `GET` | `/api/players?page=1&pageSize=20&teamId={teamId}` |
+| `GET` | `/api/players/{id}` |
 | `POST` | `/api/players` |
 | `PUT` | `/api/players/{id}` |
 | `DELETE` | `/api/players/{id}` |
+| `GET` | `/api/matches?page=1&pageSize=20` |
+| `GET` | `/api/matches/{id}` |
 | `POST` | `/api/matches` |
 | `PUT` | `/api/matches/{id}` |
 | `DELETE` | `/api/matches/{id}` |

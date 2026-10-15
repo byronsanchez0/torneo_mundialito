@@ -1,8 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Mundialito.Application.Contracts;
+using Mundialito.Application.Features.Matches.Queries;
+using Mundialito.Application.Features.Players.Queries;
+using Mundialito.Application.Features.Teams.Queries;
 using Mundialito.Infrastructure.Persistence;
+using Mundialito.Infrastructure.Queries;
 using Mundialito.Infrastructure.Repositories;
 
 namespace Mundialito.Infrastructure;
@@ -16,11 +21,16 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("PostgreSql")
             ?? throw new InvalidOperationException("No se configuró la conexión PostgreSql.");
 
-        services.AddDbContext<MundialitoDbContext>(options => options.UseNpgsql(connectionString));
+        services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
+        services.AddDbContext<MundialitoDbContext>((serviceProvider, options) =>
+            options.UseNpgsql(serviceProvider.GetRequiredService<NpgsqlDataSource>()));
         services.AddScoped<ITeamRepository, TeamRepository>();
         services.AddScoped<IPlayerRepository, PlayerRepository>();
         services.AddScoped<IMatchRepository, MatchRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ITeamQueries, TeamQueries>();
+        services.AddScoped<IPlayerQueries, PlayerQueries>();
+        services.AddScoped<IMatchQueries, MatchQueries>();
 
         return services;
     }

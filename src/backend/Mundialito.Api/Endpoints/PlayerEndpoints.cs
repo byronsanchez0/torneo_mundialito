@@ -1,4 +1,5 @@
 using Mundialito.Application.Features.Players.Commands;
+using Mundialito.Application.Features.Players.Queries;
 
 namespace Mundialito.Api.Endpoints;
 
@@ -7,6 +8,29 @@ internal static class PlayerEndpoints
     public static IEndpointRouteBuilder MapPlayerEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var group = endpoints.MapGroup("/api/players").WithTags("Players");
+
+        group.MapGet("", async (
+            GetPlayersQueryHandler handler,
+            CancellationToken cancellationToken,
+            int page = 1,
+            int pageSize = 20,
+            Guid? teamId = null) =>
+        {
+            var result = await handler.HandleAsync(
+                new GetPlayersQuery(page, pageSize, teamId),
+                cancellationToken);
+
+            return Results.Ok(result);
+        });
+
+        group.MapGet("/{id:guid}", async (
+            Guid id,
+            GetPlayerByIdQueryHandler handler,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await handler.HandleAsync(new GetPlayerByIdQuery(id), cancellationToken);
+            return result.IsSuccess ? Results.Ok(result.Value) : result.ToHttpFailure();
+        });
 
         group.MapPost("", async (
             CreatePlayerRequest request,
