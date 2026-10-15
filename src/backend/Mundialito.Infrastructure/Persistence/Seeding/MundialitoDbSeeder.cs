@@ -28,17 +28,17 @@ internal sealed class MundialitoDbSeeder(
 
     private static Team[] CreateTeams() =>
     [
-        new("Quetzales", "Carlos Méndez"),
-        new("Jaguares", "Andrea López"),
-        new("Cóndores", "Miguel Herrera"),
-        new("Toros", "Sofía Castillo")
+        new("Liverpool", "Carlos Méndez"),
+        new("Barcelona", "Andrea López"),
+        new("Real Madrid", "Miguel Herrera"),
+        new("PSG", "Sofía Castillo")
     ];
 
     private static Player[] CreatePlayers(IReadOnlyList<Team> teams) =>
     [
-        new(teams[0].Id, "Luis", "García", 1, "Portero"),
-        new(teams[0].Id, "Diego", "Morales", 4, "Defensa"),
-        new(teams[0].Id, "Marco", "Reyes", 6, "Mediocampista"),
+        new(teams[0].Id, "Miguel Alberto", "Rodriguez Barrientos", 1, "Portero"),
+        new(teams[0].Id, "Cesar Mauricio", "Guerrero Batres", 4, "Defensa"),
+        new(teams[0].Id, "Juan Carlos", "Juarez Ruano", 6, "Mediocampista"),
         new(teams[0].Id, "Pablo", "Díaz", 9, "Delantero"),
         new(teams[0].Id, "José", "Ramírez", 10, "Delantero"),
 

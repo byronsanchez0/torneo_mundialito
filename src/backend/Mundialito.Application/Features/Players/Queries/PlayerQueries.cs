@@ -15,15 +15,22 @@ public sealed record PlayerDto(
 public interface IPlayerQueries
 {
     Task<PagedResult<PlayerDto>> GetPagedAsync(
-        int page,
-        int pageSize,
-        Guid? teamId,
+        GetPlayersQuery query,
         CancellationToken cancellationToken = default);
 
     Task<PlayerDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }
 
-public sealed record GetPlayersQuery(int Page = 1, int PageSize = 20, Guid? TeamId = null);
+public sealed record GetPlayersQuery(
+    int PageNumber = 1,
+    int PageSize = 10,
+    string SortBy = "lastName",
+    string SortDirection = "asc",
+    Guid? TeamId = null,
+    string? Name = null,
+    string? Position = null,
+    int? ShirtNumber = null);
+
 public sealed record GetPlayerByIdQuery(Guid Id);
 
 public sealed class GetPlayersQueryHandler(IPlayerQueries playerQueries)
@@ -32,10 +39,24 @@ public sealed class GetPlayersQueryHandler(IPlayerQueries playerQueries)
         GetPlayersQuery query,
         CancellationToken cancellationToken = default)
     {
-        var page = Math.Max(query.Page, 1);
-        var pageSize = Math.Clamp(query.PageSize, 1, 100);
-        return playerQueries.GetPagedAsync(page, pageSize, query.TeamId, cancellationToken);
+        var normalizedQuery = query with
+        {
+            PageNumber = Math.Max(query.PageNumber, 1),
+            PageSize = Math.Clamp(query.PageSize, 1, 100),
+            SortBy = string.IsNullOrWhiteSpace(query.SortBy) ? "lastName" : query.SortBy.Trim(),
+            SortDirection = NormalizeSortDirection(query.SortDirection),
+            Name = NormalizeFilter(query.Name),
+            Position = NormalizeFilter(query.Position)
+        };
+
+        return playerQueries.GetPagedAsync(normalizedQuery, cancellationToken);
     }
+
+    private static string NormalizeSortDirection(string sortDirection) =>
+        string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase) ? "desc" : "asc";
+
+    private static string? NormalizeFilter(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }
 
 public sealed class GetPlayerByIdQueryHandler(IPlayerQueries playerQueries)

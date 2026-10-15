@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "INFATLAN Mundialito",
-  description: "Administración del torneo INFATLAN"
+  title: "INFATLAN Mundialito | Panel del torneo",
+  description: "Equipos, partidos, resultados y estadísticas del Mundialito"
 };
 
 export default function RootLayout({ children }) {

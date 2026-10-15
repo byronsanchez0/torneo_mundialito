@@ -13,11 +13,25 @@ internal static class MatchEndpoints
         group.MapGet("", async (
             GetMatchesQueryHandler handler,
             CancellationToken cancellationToken,
-            int page = 1,
-            int pageSize = 20) =>
+            int pageNumber = 1,
+            int pageSize = 10,
+            string sortBy = "scheduledAtUtc",
+            string sortDirection = "desc",
+            Guid? teamId = null,
+            string? status = null,
+            DateTime? fromDate = null,
+            DateTime? toDate = null) =>
         {
             var result = await handler.HandleAsync(
-                new GetMatchesQuery(page, pageSize),
+                new GetMatchesQuery(
+                    pageNumber,
+                    pageSize,
+                    sortBy,
+                    sortDirection,
+                    teamId,
+                    status,
+                    fromDate,
+                    toDate),
                 cancellationToken);
 
             return Results.Ok(result);

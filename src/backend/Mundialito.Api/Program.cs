@@ -3,6 +3,7 @@ using Mundialito.Application.Features.Matches.Commands;
 using Mundialito.Application.Features.Matches.Queries;
 using Mundialito.Application.Features.Players.Commands;
 using Mundialito.Application.Features.Players.Queries;
+using Mundialito.Application.Features.Statistics.Queries;
 using Mundialito.Application.Features.Teams.Commands;
 using Mundialito.Application.Features.Teams.Queries;
 using Mundialito.Infrastructure;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<GetPlayersQueryHandler>();
 builder.Services.AddScoped<GetPlayerByIdQueryHandler>();
 builder.Services.AddScoped<GetMatchesQueryHandler>();
 builder.Services.AddScoped<GetMatchByIdQueryHandler>();
+builder.Services.AddScoped<GetTournamentStatisticsQueryHandler>();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy => policy
@@ -57,6 +59,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapTeamEndpoints();
 app.MapPlayerEndpoints();
 app.MapMatchEndpoints();
+app.MapStatisticsEndpoints();
 
 app.Run();
 

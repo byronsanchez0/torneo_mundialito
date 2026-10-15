@@ -13,14 +13,20 @@ public sealed record TeamDto(
 public interface ITeamQueries
 {
     Task<PagedResult<TeamDto>> GetPagedAsync(
-        int page,
-        int pageSize,
+        GetTeamsQuery query,
         CancellationToken cancellationToken = default);
 
     Task<TeamDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }
 
-public sealed record GetTeamsQuery(int Page = 1, int PageSize = 20);
+public sealed record GetTeamsQuery(
+    int PageNumber = 1,
+    int PageSize = 10,
+    string SortBy = "name",
+    string SortDirection = "asc",
+    string? Name = null,
+    string? Coach = null);
+
 public sealed record GetTeamByIdQuery(Guid Id);
 
 public sealed class GetTeamsQueryHandler(ITeamQueries teamQueries)
@@ -29,10 +35,24 @@ public sealed class GetTeamsQueryHandler(ITeamQueries teamQueries)
         GetTeamsQuery query,
         CancellationToken cancellationToken = default)
     {
-        var page = Math.Max(query.Page, 1);
-        var pageSize = Math.Clamp(query.PageSize, 1, 100);
-        return teamQueries.GetPagedAsync(page, pageSize, cancellationToken);
+        var normalizedQuery = query with
+        {
+            PageNumber = Math.Max(query.PageNumber, 1),
+            PageSize = Math.Clamp(query.PageSize, 1, 100),
+            SortBy = string.IsNullOrWhiteSpace(query.SortBy) ? "name" : query.SortBy.Trim(),
+            SortDirection = NormalizeSortDirection(query.SortDirection),
+            Name = NormalizeFilter(query.Name),
+            Coach = NormalizeFilter(query.Coach)
+        };
+
+        return teamQueries.GetPagedAsync(normalizedQuery, cancellationToken);
     }
+
+    private static string NormalizeSortDirection(string sortDirection) =>
+        string.Equals(sortDirection, "desc", StringComparison.OrdinalIgnoreCase) ? "desc" : "asc";
+
+    private static string? NormalizeFilter(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }
 
 public sealed class GetTeamByIdQueryHandler(ITeamQueries teamQueries)

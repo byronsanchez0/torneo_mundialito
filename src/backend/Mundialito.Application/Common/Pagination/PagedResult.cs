@@ -1,12 +1,12 @@
 namespace Mundialito.Application.Common.Pagination;
 
 public sealed record PagedResult<T>(
-    IReadOnlyCollection<T> Items,
-    int Page,
+    IReadOnlyCollection<T> Data,
+    int PageNumber,
     int PageSize,
-    long TotalCount)
+    long TotalRecords)
 {
-    public int TotalPages => TotalCount == 0
+    public int TotalPages => TotalRecords == 0
         ? 0
-        : (int)Math.Ceiling(TotalCount / (double)PageSize);
+        : (int)Math.Ceiling(TotalRecords / (double)PageSize);
 }

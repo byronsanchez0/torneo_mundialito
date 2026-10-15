@@ -5,6 +5,7 @@ using Npgsql;
 using Mundialito.Application.Contracts;
 using Mundialito.Application.Features.Matches.Queries;
 using Mundialito.Application.Features.Players.Queries;
+using Mundialito.Application.Features.Statistics.Queries;
 using Mundialito.Application.Features.Teams.Queries;
 using Mundialito.Infrastructure.Idempotency;
 using Mundialito.Infrastructure.Persistence;
@@ -35,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<ITeamQueries, TeamQueries>();
         services.AddScoped<IPlayerQueries, PlayerQueries>();
         services.AddScoped<IMatchQueries, MatchQueries>();
+        services.AddScoped<ITournamentStatisticsQueries, TournamentStatisticsQueries>();
 
         return services;
     }

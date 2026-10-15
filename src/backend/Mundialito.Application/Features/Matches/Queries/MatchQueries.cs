@@ -36,14 +36,22 @@ public sealed record MatchDetailsDto(
 public interface IMatchQueries
 {
     Task<PagedResult<MatchDto>> GetPagedAsync(
-        int page,
-        int pageSize,
+        GetMatchesQuery query,
         CancellationToken cancellationToken = default);
 
     Task<MatchDetailsDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }
 
-public sealed record GetMatchesQuery(int Page = 1, int PageSize = 20);
+public sealed record GetMatchesQuery(
+    int PageNumber = 1,
+    int PageSize = 10,
+    string SortBy = "scheduledAtUtc",
+    string SortDirection = "desc",
+    Guid? TeamId = null,
+    string? Status = null,
+    DateTime? FromDate = null,
+    DateTime? ToDate = null);
+
 public sealed record GetMatchByIdQuery(Guid Id);
 
 public sealed class GetMatchesQueryHandler(IMatchQueries matchQueries)
@@ -52,10 +60,30 @@ public sealed class GetMatchesQueryHandler(IMatchQueries matchQueries)
         GetMatchesQuery query,
         CancellationToken cancellationToken = default)
     {
-        var page = Math.Max(query.Page, 1);
-        var pageSize = Math.Clamp(query.PageSize, 1, 100);
-        return matchQueries.GetPagedAsync(page, pageSize, cancellationToken);
+        var normalizedQuery = query with
+        {
+            PageNumber = Math.Max(query.PageNumber, 1),
+            PageSize = Math.Clamp(query.PageSize, 1, 100),
+            SortBy = string.IsNullOrWhiteSpace(query.SortBy)
+                ? "scheduledAtUtc"
+                : query.SortBy.Trim(),
+            SortDirection = NormalizeSortDirection(query.SortDirection),
+            Status = NormalizeFilter(query.Status),
+            FromDate = NormalizeDate(query.FromDate),
+            ToDate = NormalizeDate(query.ToDate)
+        };
+
+        return matchQueries.GetPagedAsync(normalizedQuery, cancellationToken);
     }
+
+    private static string NormalizeSortDirection(string sortDirection) =>
+        string.Equals(sortDirection, "asc", StringComparison.OrdinalIgnoreCase) ? "asc" : "desc";
+
+    private static string? NormalizeFilter(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+    private static DateTime? NormalizeDate(DateTime? value) =>
+        value?.ToUniversalTime();
 }
 
 public sealed class GetMatchByIdQueryHandler(IMatchQueries matchQueries)

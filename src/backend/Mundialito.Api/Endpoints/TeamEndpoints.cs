@@ -13,11 +13,21 @@ internal static class TeamEndpoints
         group.MapGet("", async (
             GetTeamsQueryHandler handler,
             CancellationToken cancellationToken,
-            int page = 1,
-            int pageSize = 20) =>
+            int pageNumber = 1,
+            int pageSize = 10,
+            string sortBy = "name",
+            string sortDirection = "asc",
+            string? name = null,
+            string? coach = null) =>
         {
             var result = await handler.HandleAsync(
-                new GetTeamsQuery(page, pageSize),
+                new GetTeamsQuery(
+                    pageNumber,
+                    pageSize,
+                    sortBy,
+                    sortDirection,
+                    name,
+                    coach),
                 cancellationToken);
 
             return Results.Ok(result);
