@@ -10,6 +10,7 @@ internal sealed class GoalConfiguration : IEntityTypeConfiguration<Goal>
     {
         builder.ToTable("goals");
         builder.HasKey(goal => goal.Id);
+        builder.Property(goal => goal.Id).ValueGeneratedNever();
 
         builder.HasOne<Player>()
             .WithMany()
