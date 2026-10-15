@@ -1,0 +1,14 @@
+.git
+.gitignore
+.docker
+.cache
+.downloads
+.packages
+.tmp
+**/bin
+**/obj
+**/node_modules
+**/.next
+**/.env*
+README.md
+

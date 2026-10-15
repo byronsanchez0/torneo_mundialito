@@ -1,0 +1,32 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Next.js / Node.js
+node_modules/
+.next/
+out/
+npm-debug.log*
+
+# Configuración local
+.env
+.env.local
+appsettings.Development.json
+
+# Temporales y cachés del workspace
+.tmp/
+.cache/
+.downloads/
+.packages/
+.docker/
+
+# Editores y sistema operativo
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+

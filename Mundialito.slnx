@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="src/backend/Mundialito.Domain/Mundialito.Domain.csproj" />
+  <Project Path="src/backend/Mundialito.Application/Mundialito.Application.csproj" />
+  <Project Path="src/backend/Mundialito.Infrastructure/Mundialito.Infrastructure.csproj" />
+  <Project Path="src/backend/Mundialito.Api/Mundialito.Api.csproj" />
+</Solution>
+
