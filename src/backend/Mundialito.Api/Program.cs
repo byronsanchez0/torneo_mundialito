@@ -36,6 +36,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.Use(async (context, next) =>
+{
+    if (HttpMethods.IsPost(context.Request.Method))
+    {
+        context.Request.EnableBuffering();
+    }
+
+    await next(context);
+});
+
 if (builder.Configuration.GetValue<bool>("InitializeDatabase"))
 {
     await app.Services.InitializeDatabaseAsync();

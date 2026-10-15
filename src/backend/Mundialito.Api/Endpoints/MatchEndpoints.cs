@@ -1,5 +1,6 @@
 using Mundialito.Application.Features.Matches.Commands;
 using Mundialito.Application.Features.Matches.Queries;
+using Mundialito.Api.Idempotency;
 
 namespace Mundialito.Api.Endpoints;
 
@@ -43,9 +44,9 @@ internal static class MatchEndpoints
 
             var result = await handler.HandleAsync(command, cancellationToken);
             return result.IsSuccess
-                ? Results.Created($"/api/matches/{result.Value}", new { id = result.Value })
+                ? Results.Json(new { id = result.Value }, statusCode: StatusCodes.Status201Created)
                 : result.ToHttpFailure();
-        });
+        }).AddEndpointFilter<IdempotencyEndpointFilter>();
 
         group.MapPut("/{id:guid}", async (
             Guid id,
@@ -60,7 +61,7 @@ internal static class MatchEndpoints
                 request.ScheduledAtUtc);
 
             var result = await handler.HandleAsync(command, cancellationToken);
-            return result.IsSuccess ? Results.NoContent() : result.ToHttpFailure();
+            return result.IsSuccess ? Results.Ok() : result.ToHttpFailure();
         });
 
         group.MapDelete("/{id:guid}", async (
@@ -69,7 +70,7 @@ internal static class MatchEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await handler.HandleAsync(new DeleteMatchCommand(id), cancellationToken);
-            return result.IsSuccess ? Results.NoContent() : result.ToHttpFailure();
+            return result.IsSuccess ? Results.Ok() : result.ToHttpFailure();
         });
 
         group.MapPost("/{matchId:guid}/goals", async (
@@ -86,9 +87,9 @@ internal static class MatchEndpoints
 
             var result = await handler.HandleAsync(command, cancellationToken);
             return result.IsSuccess
-                ? Results.Created($"/api/matches/{matchId}/goals/{result.Value}", new { id = result.Value })
+                ? Results.Json(new { id = result.Value }, statusCode: StatusCodes.Status201Created)
                 : result.ToHttpFailure();
-        });
+        }).AddEndpointFilter<IdempotencyEndpointFilter>();
 
         return endpoints;
     }

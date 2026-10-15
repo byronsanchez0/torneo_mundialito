@@ -1,5 +1,6 @@
 using Mundialito.Application.Features.Players.Commands;
 using Mundialito.Application.Features.Players.Queries;
+using Mundialito.Api.Idempotency;
 
 namespace Mundialito.Api.Endpoints;
 
@@ -46,9 +47,9 @@ internal static class PlayerEndpoints
 
             var result = await handler.HandleAsync(command, cancellationToken);
             return result.IsSuccess
-                ? Results.Created($"/api/players/{result.Value}", new { id = result.Value })
+                ? Results.Json(new { id = result.Value }, statusCode: StatusCodes.Status201Created)
                 : result.ToHttpFailure();
-        });
+        }).AddEndpointFilter<IdempotencyEndpointFilter>();
 
         group.MapPut("/{id:guid}", async (
             Guid id,
@@ -65,7 +66,7 @@ internal static class PlayerEndpoints
                 request.Position);
 
             var result = await handler.HandleAsync(command, cancellationToken);
-            return result.IsSuccess ? Results.NoContent() : result.ToHttpFailure();
+            return result.IsSuccess ? Results.Ok() : result.ToHttpFailure();
         });
 
         group.MapDelete("/{id:guid}", async (
@@ -74,7 +75,7 @@ internal static class PlayerEndpoints
             CancellationToken cancellationToken) =>
         {
             var result = await handler.HandleAsync(new DeletePlayerCommand(id), cancellationToken);
-            return result.IsSuccess ? Results.NoContent() : result.ToHttpFailure();
+            return result.IsSuccess ? Results.Ok() : result.ToHttpFailure();
         });
 
         return endpoints;

@@ -57,6 +57,25 @@ paginan desde PostgreSQL.
 | `DELETE` | `/api/matches/{id}` |
 | `POST` | `/api/matches/{matchId}/goals` |
 
+### Idempotencia
+
+Todos los endpoints `POST` requieren el header `Idempotency-Key`:
+
+```text
+Idempotency-Key: 0c5eccee-1f08-4c37-9bee-bf612b87701f
+```
+
+- La primera solicitud crea el recurso y responde `201 Created`.
+- Repetir la misma key con el mismo body devuelve la respuesta original sin
+  crear otro registro.
+- Reutilizar la key con un body diferente devuelve `409 Conflict`.
+- Omitir el header devuelve `400 Bad Request`.
+- El recurso y la key se guardan dentro de la misma transacción del Unit of
+  Work.
+
+Los demás resultados HTTP se mapean como `200 OK`, `400 Bad Request`,
+`404 Not Found` o `409 Conflict`, según el resultado del caso de uso.
+
 ## Base de datos
 
 La API espera PostgreSQL en `localhost:5455`. La cadena predeterminada es solo
@@ -118,4 +137,6 @@ docker-compose up
 
 El comando construye e inicia PostgreSQL, la API y el frontend. En este entorno
 Docker, la API crea el esquema inicial de la base de datos si todavía no existe.
+Si la tabla de equipos está vacía, también agrega automáticamente 4 equipos,
+5 jugadores por equipo y 6 partidos, de los cuales 3 incluyen resultados.
 
